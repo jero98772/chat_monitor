@@ -44,6 +44,20 @@ run-client: $(TARGET)
 	./$(TARGET) client $(PORT) 127.0.0.1 
 
 
+# Ejecutar el middle servidor
+run-middle-server: $(TARGET)
+	./$(TARGET) server-middle $(PORT)
+
+# Ejecutar el middle cliente
+run-middle-client: $(TARGET)
+	./$(TARGET) client-middle 127.0.0.1  $(PORT)
+
+
+# Ejecutar el middle
+run-middle: $(TARGET)
+	./$(TARGET) middle 12345 127.0.0.1  $(PORT)
+
+
 
 # Declarar reglas como phony
 .PHONY: all clean run-servidor run-cliente

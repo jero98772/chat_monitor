@@ -37,3 +37,9 @@ the problem is why i can't run another instance of a server in other port
 
 
 but when we test test/client.cpp and test/server.cpp  it can handle multiples clients and servers without problem
+
+there is another way to do this is like a spy, or super chat
+
+is a layer when a code is conected to all servers as a client
+
+![](https://raw.githubusercontent.com/jero98772/chat_monitor/main/pictures/2.png)

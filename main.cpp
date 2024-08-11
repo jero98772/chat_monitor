@@ -39,7 +39,7 @@ int main(int argc, char* argv[]) {
     if (modo == "server") {
         std::thread servidorThread(iniciarServidor, puerto);
         servidorThread.join();
-    } else if (modo == "client") {
+    }else if (modo == "client") {
         if (argc < 4) {
             std::cerr << "Falta la dirección IP del servidor para el modo cliente." << std::endl;
             return 1;
@@ -47,6 +47,31 @@ int main(int argc, char* argv[]) {
         std::string direccionIP = argv[3];
         std::thread clienteThread(iniciarCliente, direccionIP, puerto);
         clienteThread.join();
+    }else if (modo == "server-middle") {
+
+        std::thread servidorThread(iniciarServidor, puerto);
+        servidorThread.join();
+    }else if (modo == "client-middle") {
+        if (argc < 4) {
+            std::cerr << "Falta la dirección IP del servidor para el modo cliente." << std::endl;
+            return 1;
+        }
+        std::string direccionIP = argv[3];
+        std::thread clienteThread(iniciarCliente, direccionIP, puerto);
+        clienteThread.join();
+
+    }else if (modo == "middle") {
+        int puertoServidor = std::stoi(argv[2]);
+        std::string direccionIP = argv[3];
+        int puertoCliente = std::stoi(argv[4]);
+
+        // Start the server in a separate thread
+        std::thread servidorThread(iniciarServidor, puertoServidor);
+
+        std::thread clienteThread(iniciarCliente, direccionIP, puertoCliente);
+
+        // Join the server thread to wait for its completion
+        servidorThread.join();
     } else {
         std::cerr << "Modo no válido. Use 'servidor' o 'cliente'." << std::endl;
         return 1;
