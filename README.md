@@ -42,4 +42,4 @@ there is another way to do this is like a spy, or super chat
 
 is a layer when a code is conected to all servers as a client
 
-![](https://raw.githubusercontent.com/jero98772/chat_monitor/main/pictures/2.png)
+![](https://raw.githubusercontent.com/jero98772/chat_monitor/main/pictures/4.png)
