@@ -11,6 +11,7 @@ ClienteChat::ClienteChat(const std::string& direccionIP, int puerto)
 
 // Método para conectar al servidor
 void ClienteChat::conectarAlServidor() {
+    // Crear el socket del cliente
     descriptorCliente = socket(AF_INET, SOCK_STREAM, 0);
     if (descriptorCliente == -1) {
         std::cerr << "Error al crear el socket del cliente.\n";
@@ -22,6 +23,7 @@ void ClienteChat::conectarAlServidor() {
     direccionServidor.sin_port = htons(puerto);
     inet_pton(AF_INET, direccionIP.c_str(), &direccionServidor.sin_addr);
 
+    // Conectar al servidor
     if (connect(descriptorCliente, (sockaddr*)&direccionServidor, sizeof(direccionServidor)) == -1) {
         std::cerr << "Error al conectar al servidor.\n";
         return;
@@ -29,6 +31,7 @@ void ClienteChat::conectarAlServidor() {
 
     conectado = true;
 
+    // Iniciar un hilo para recibir mensajes del servidor
     std::thread hiloRecibir(&ClienteChat::recibirMensajes, this);
     hiloRecibir.detach();
 }

@@ -1,34 +1,26 @@
 #ifndef SERVIDORCHAT_H
 #define SERVIDORCHAT_H
 
+#include "Usuario.h"
 #include <string>
 #include <vector>
 #include <mutex>
-#include "Usuario.h"
 
 class ServidorChat {
 public:
     ServidorChat(int puerto);
     void iniciar();
-    void manejarComando(const std::string& comando);
-    void manejarMensajeDeServidor(const std::string& mensaje);
+
 private:
-    int puerto;
-    int descriptorServidor;
-    std::vector<std::string> servidoresFederados; // List of federated servers
-    std::mutex mutexUsuarios;
-    std::vector<Usuario> usuarios; // Correct
-    void manejarCliente(int descriptorCliente);     
-    void aceptarConexiones();
-    void gestionarConexiones();
-    void comunicacionEntreServidores(const std::string& direccion);
+    void manejarCliente(int descriptorCliente);
     void enviarMensajeATodos(const std::string& mensaje, int descriptorRemitente);
     void enviarListaUsuarios(int descriptorCliente);
     void enviarDetallesConexion(int descriptorCliente);
-    void conectarAServidoresFederados(); // Connect to federated servers
 
-    void broadcastMessage(const std::string& mensaje);
-    void processCommand(const std::string& comando);
+    int puerto;  // Puerto en el que escucha el servidor
+    int descriptorServidor;  // Descriptor del socket del servidor
+    std::vector<Usuario> usuarios;  // Lista de usuarios conectados
+    std::mutex mutexUsuarios;  // Mutex para proteger el acceso a la lista de usuarios
 };
 
 #endif // SERVIDORCHAT_H

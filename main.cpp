@@ -1,79 +1,96 @@
-#include "ServidorChat.h"
-#include "ClienteChat.h"
 #include <iostream>
+#include <fstream>
+#include <sstream>
+#include <vector>
 #include <string>
-#include <thread>
 
-// Function to start the chat server
-void iniciarServidor(int puerto) {
-    ServidorChat servidor(puerto);
-    servidor.iniciar();
-}
+#include "ClienteChat.h"
+#include "ServidorChat.h"
 
-// Function to start the chat client
-void iniciarCliente(const std::string& direccionIP, int puerto) {
-    ClienteChat cliente(direccionIP, puerto);
-    cliente.conectarAlServidor();
 
-    std::string comando;
-    while (true) {
-        std::getline(std::cin, comando);
-        if (comando == "@salir") {
-            cliente.desconectar();
-            break;
-        }
-        cliente.manejarComando(comando);
+
+std::vector<std::vector<std::string>> readAndParseFile(const std::string& filename) {
+    std::ifstream file(filename);
+    std::vector<std::vector<std::string>> matrix;
+    std::string line;
+
+    if (!file.is_open()) {
+        std::cerr << "Error opening file: " << filename << std::endl;
+        return matrix;
     }
+
+    while (std::getline(file, line)) {
+        std::stringstream ss(line);
+        std::string value1, value2;
+
+        if (std::getline(ss, value1, ':') && std::getline(ss, value2)) {
+            matrix.push_back({value1, value2});
+        }
+    }
+
+    file.close();
+    return matrix;
 }
 
 int main(int argc, char* argv[]) {
-    if (argc < 3) {
-        std::cerr << "Uso: " << argv[0] << " <modo> <puerto> [direccionIP]" << std::endl;
-        std::cerr << "Modos disponibles: servidor, cliente" << std::endl;
+    if (argc < 2) {
+        std::cerr << "Uso: " << argv[0] << " <modo> <direccionIP> <puerto>\n";
+        std::cerr << "Modos disponibles: servidor, cliente\n";
         return 1;
     }
 
     std::string modo = argv[1];
-    int puerto = std::stoi(argv[2]);
 
-    if (modo == "server") {
-        std::thread servidorThread(iniciarServidor, puerto);
-        servidorThread.join();
-    }else if (modo == "client") {
-        if (argc < 4) {
-            std::cerr << "Falta la dirección IP del servidor para el modo cliente." << std::endl;
+    if (modo == "servidor") {
+        if (argc < 3) {
+            std::cerr << "Uso: " << argv[0] << " servidor <puerto>\n";
             return 1;
         }
-        std::string direccionIP = argv[3];
-        std::thread clienteThread(iniciarCliente, direccionIP, puerto);
-        clienteThread.join();
-    }else if (modo == "server-middle") {
-
-        std::thread servidorThread(iniciarServidor, puerto);
-        servidorThread.join();
-    }else if (modo == "client-middle") {
+        int puerto = std::stoi(argv[2]);
+        ServidorChat servidor(puerto);  // Inicializa el servidor con el puerto proporcionado
+        servidor.iniciar();  // Inicia el servidor
+    } else if (modo == "cliente") {
         if (argc < 4) {
-            std::cerr << "Falta la dirección IP del servidor para el modo cliente." << std::endl;
+            std::cerr << "Uso: " << argv[0] << " cliente <direccionIP> <puerto>\n";
             return 1;
         }
-        std::string direccionIP = argv[3];
-        std::thread clienteThread(iniciarCliente, direccionIP, puerto);
-        clienteThread.join();
+        std::string direccionIP = argv[2];
+        int puerto = std::stoi(argv[3]);
+        ClienteChat cliente(direccionIP, puerto);  // Inicializa el cliente con la dirección IP y puerto proporcionados
+        cliente.conectarAlServidor();  // Conecta al servidor
 
-    }else if (modo == "middle") {
-        int puertoServidor = std::stoi(argv[2]);
-        std::string direccionIP = argv[3];
-        int puertoCliente = std::stoi(argv[4]);
+        std::string mensaje;
+        while (std::getline(std::cin, mensaje)) {
+            cliente.manejarComando(mensaje);  // Envía el mensaje al servidor
+        }
 
-        // Start the server in a separate thread
-        std::thread servidorThread(iniciarServidor, puertoServidor);
+        cliente.desconectar();  // Desconecta del servidor
+    }else if (modo == "superclient") {
+        if (argc < 3) {
+            std::cerr << "Uso: " << argv[1] << " supercliente <lista servidores.txt>\n";
+            std::cerr << "Uso: " << argv[1] << argv[2];
+            return 1;
+        }
 
-        std::thread clienteThread(iniciarCliente, direccionIP, puertoCliente);
+        std::string file = argv[2];
+        auto conections=readAndParseFile(file);
+        for (const auto& row : conections) {
+            std::cout << row[0] << " : " << row[1] << std::endl;
+            int puerto = std::stoi(row[1]);
+            ClienteChat cliente(row[0], puerto);  // Inicializa el cliente con la dirección IP y puerto proporcionados
+            cliente.conectarAlServidor();  // Conecta al servidor
+        std::string mensaje;
+        while (std::getline(std::cin, mensaje)) {
+            cliente.manejarComando(mensaje);  // Envía el mensaje al servidor
+        }
+        cliente.desconectar();  // Desconecta del servidor
+        }
+        /*
 
-        // Join the server thread to wait for its completion
-        servidorThread.join();
+
+        */
     } else {
-        std::cerr << "Modo no válido. Use 'servidor' o 'cliente'." << std::endl;
+        std::cerr << "Modo desconocido: " << modo << "\n";
         return 1;
     }
 

@@ -14,8 +14,6 @@ OBJS = $(SRCS:%.cpp=$(BUILD_DIR)/%.o)
 # Archivo ejecutable
 TARGET = $(BUILD_DIR)/chat
 
-PORT ?= 12346
-
 # Regla por defecto
 all: $(TARGET)
 
@@ -36,28 +34,16 @@ clean:
 	rm -rf $(BUILD_DIR)
 
 # Ejecutar el servidor
-run-server: $(TARGET)
-	./$(TARGET) server $(PORT)
+run-servidor: $(TARGET)
+	./$(TARGET) servidor $(PORT)
 
 # Ejecutar el cliente
-run-client: $(TARGET)
-	./$(TARGET) client $(PORT) 127.0.0.1 
+run-cliente: $(TARGET)
+	./$(TARGET) cliente $(ADDRESS) $(PORT)
 
-
-# Ejecutar el middle servidor
-run-middle-server: $(TARGET)
-	./$(TARGET) server-middle $(PORT)
-
-# Ejecutar el middle cliente
-run-middle-client: $(TARGET)
-	./$(TARGET) client-middle 127.0.0.1  $(PORT)
-
-
-# Ejecutar el middle
-run-middle: $(TARGET)
-	./$(TARGET) middle 12345 127.0.0.1  $(PORT)
-
-
+# Ejecutar el cliente
+run-sc: $(TARGET)
+	./$(TARGET) superclient $(FILE)
 
 # Declarar reglas como phony
 .PHONY: all clean run-servidor run-cliente

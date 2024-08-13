@@ -9,14 +9,14 @@ public:
     void conectarAlServidor();
     void manejarComando(const std::string& comando);
     void desconectar();
-    
+
 private:
-    std::string direccionIP;
-    int puerto;
-    int descriptorCliente;
-    bool conectado;
-    void enviarMensaje(const std::string& mensaje);
     void recibirMensajes();
+
+    std::string direccionIP;  // Dirección IP del servidor
+    int puerto;  // Puerto del servidor
+    int descriptorCliente;  // Descriptor del socket del cliente
+    bool conectado;  // Estado de la conexión
 };
 
 #endif // CLIENTECHAT_H
