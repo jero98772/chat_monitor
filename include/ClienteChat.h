@@ -9,9 +9,10 @@ public:
     void conectarAlServidor();
     void manejarComando(const std::string& comando);
     void desconectar();
+    void recibirMensajes();
+    std::string guardarMensajes();
 
 private:
-    void recibirMensajes();
 
     std::string direccionIP;  // Dirección IP del servidor
     int puerto;  // Puerto del servidor

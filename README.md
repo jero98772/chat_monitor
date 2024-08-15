@@ -43,3 +43,27 @@ there is another way to do this is like a spy, or super chat
 is a layer when a code is conected to all servers as a client
 
 ![](https://raw.githubusercontent.com/jero98772/chat_monitor/main/pictures/4.png)
+
+
+### execute
+
+frist run :
+
+**server**
+
+create all servers that you like with:
+
+	./build/chat servidor 6666
+
+**client**
+
+create all clients that you like with:
+
+
+	./build/chat cliente 127.0.0.1 6666
+
+**superclient**
+
+the server must be in servers.txt
+
+	./build/chat superclient servers.txt 

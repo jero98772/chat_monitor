@@ -3,6 +3,8 @@
 #include <sstream>
 #include <vector>
 #include <string>
+#include <thread>
+#include <chrono>
 
 #include "ClienteChat.h"
 #include "ServidorChat.h"
@@ -30,6 +32,46 @@ std::vector<std::vector<std::string>> readAndParseFile(const std::string& filena
 
     file.close();
     return matrix;
+}
+
+void recibirMensajesDeServidor(ClienteChat& cliente) {
+    cliente.recibirMensajes();  // Start receiving messages from the server
+}
+
+void appendToFile(const std::string& fileName, const std::string& text) {
+    std::ofstream file;
+    
+    // Open the file in append mode
+    file.open(fileName, std::ios_base::app);
+    
+    if (file.is_open()) {
+        file << text << std::endl;  // Append the text to the file
+        file.close();  // Close the file
+    } else {
+        std::cerr << "Unable to open file." << std::endl;
+    }
+}
+
+void enviarComandos(std::vector<ClienteChat>& clientes) {
+    std::string mensaje;
+    while (std::getline(std::cin, mensaje)) {
+        std::cout<< mensaje;
+        for (auto& cliente : clientes) {
+            cliente.manejarComando(mensaje);
+        }
+    }
+}
+
+void recibirMensajesDeTodos(std::vector<ClienteChat>& clientes) {
+    std::vector<std::thread> recvThreads;
+    for (auto& cliente : clientes) {
+        recvThreads.emplace_back(&ClienteChat::guardarMensajes, &cliente);
+    }
+    
+    // Join all receiving threads
+    for (auto& t : recvThreads) {
+        t.join();
+    }
 }
 
 int main(int argc, char* argv[]) {
@@ -74,17 +116,44 @@ int main(int argc, char* argv[]) {
 
         std::string file = argv[2];
         auto conections=readAndParseFile(file);
+        std::vector<std::thread> threads;
+        std::vector<ClienteChat> clientes;
+
         for (const auto& row : conections) {
             std::cout << row[0] << " : " << row[1] << std::endl;
             int puerto = std::stoi(row[1]);
+
+
             ClienteChat cliente(row[0], puerto);  // Inicializa el cliente con la dirección IP y puerto proporcionados
             cliente.conectarAlServidor();  // Conecta al servidor
-        std::string mensaje;
-        while (std::getline(std::cin, mensaje)) {
+            std::this_thread::sleep_for(std::chrono::microseconds(100));
+
+            std::string mensaje;
+            mensaje="monitor";
             cliente.manejarComando(mensaje);  // Envía el mensaje al servidor
+            
+            /*
+            std::this_thread::sleep_for(std::chrono::microseconds(100));
+            mensaje=":hola";
+            cliente.manejarComando(mensaje);  // Envía el mensaje al servidor
+            std::this_thread::sleep_for(std::chrono::microseconds(100));
+            mensaje="mi nombre es fraile";
+            cliente.manejarComando(mensaje);  // Envía el mensaje al servidor
+            */
+
+            //threads.emplace_back(recibirMensajesDeServidor, std::ref(cliente));
+
+            
+
         }
-        cliente.desconectar();  // Desconecta del servidor
+        for (auto& thread : threads) {
+            thread.join();
         }
+        std::thread sendThread(enviarComandos, std::ref(clientes));
+        std::thread recvThread(recibirMensajesDeTodos, std::ref(clientes));
+        sendThread.join();
+        recvThread.join();
+
         /*
 
 

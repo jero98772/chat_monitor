@@ -65,3 +65,18 @@ void ClienteChat::recibirMensajes() {
         std::cout << std::string(buffer, bytesRecibidos) << std::endl;
     }
 }
+
+
+std::string ClienteChat::guardarMensajes() {
+    char buffer[1024];
+    while (conectado) {
+        memset(buffer, 0, sizeof(buffer));
+        ssize_t bytesRecibidos = recv(descriptorCliente, buffer, 1024, 0);
+        if (bytesRecibidos <= 0) {
+            std::cerr << "Desconectado del servidor.\n";
+            desconectar();
+            break;
+        }
+        return std::string(buffer, bytesRecibidos);
+    }
+}

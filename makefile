@@ -45,5 +45,9 @@ run-cliente: $(TARGET)
 run-sc: $(TARGET)
 	./$(TARGET) superclient $(FILE)
 
+#./build/chat servidor 6666
+#./build/chat servidor 9999
+#./build/chat servidor 3333
+
 # Declarar reglas como phony
 .PHONY: all clean run-servidor run-cliente
