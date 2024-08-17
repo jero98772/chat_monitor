@@ -5,11 +5,36 @@
 #include <string>
 #include <thread>
 #include <chrono>
+#include <iostream>
+#include <functional>
 
 #include "ClienteChat.h"
 #include "ServidorChat.h"
 
 
+//////////////////////////////////////
+//DEFINES 
+//#define banco
+#ifdef banco
+
+
+#endif 
+
+#define productividad
+#ifdef productividad
+
+
+#endif 
+
+
+
+
+
+//////////////////////////////////////
+
+
+//////////////////////////////////////
+//  AUXILIAR FUNCTIONS
 
 std::vector<std::vector<std::string>> readAndParseFile(const std::string& filename) {
     std::ifstream file(filename);
@@ -38,34 +63,37 @@ void recibirMensajesDeServidor(ClienteChat& cliente) {
     cliente.recibirMensajes();  // Start receiving messages from the server
 }
 
-void appendToFile(const std::string& fileName, const std::string& text) {
-    std::ofstream file;
-    
-    // Open the file in append mode
-    file.open(fileName, std::ios_base::app);
-    
-    if (file.is_open()) {
-        file << text << std::endl;  // Append the text to the file
-        file.close();  // Close the file
-    } else {
-        std::cerr << "Unable to open file." << std::endl;
-    }
-}
 
 void enviarComandos(std::vector<ClienteChat>& clientes) {
     std::string mensaje;
     while (std::getline(std::cin, mensaje)) {
-        std::cout<< mensaje;
+        std::cout<< "while"<<"\n";
         for (auto& cliente : clientes) {
+            std::cout<< "for"<<"\n";
+            if(mensaje=="/exit"){
+                std::cout<< mensaje<<"\n";
+                cliente.desconectar();//if i dont desconect myself it will give a error when you try to conectate againg with the same port
+                //exit(0);
+            }else{
+            //comands of the macros #ifdef ... #endif
+            #ifdef banco
+
+
+            #endif
+            #ifdef productividad
+
+
+            #endif
+            }
             cliente.manejarComando(mensaje);
         }
     }
 }
 
-void recibirMensajesDeTodos(std::vector<ClienteChat>& clientes) {
+void recibirMensajesDeTodos(std::vector<ClienteChat>& clientes, const std::string& fileName) {
     std::vector<std::thread> recvThreads;
     for (auto& cliente : clientes) {
-        recvThreads.emplace_back(&ClienteChat::guardarMensajes, &cliente);
+        recvThreads.emplace_back(&ClienteChat::guardarMensajes, &cliente, fileName);
     }
     
     // Join all receiving threads
@@ -74,7 +102,10 @@ void recibirMensajesDeTodos(std::vector<ClienteChat>& clientes) {
     }
 }
 
+//////////////////////////////////////
+
 int main(int argc, char* argv[]) {
+
     if (argc < 2) {
         std::cerr << "Uso: " << argv[0] << " <modo> <direccionIP> <puerto>\n";
         std::cerr << "Modos disponibles: servidor, cliente\n";
@@ -140,7 +171,7 @@ int main(int argc, char* argv[]) {
             mensaje="mi nombre es fraile";
             cliente.manejarComando(mensaje);  // Envía el mensaje al servidor
             */
-
+            clientes.push_back(cliente);
             //threads.emplace_back(recibirMensajesDeServidor, std::ref(cliente));
 
             
@@ -149,8 +180,12 @@ int main(int argc, char* argv[]) {
         for (auto& thread : threads) {
             thread.join();
         }
+
+
         std::thread sendThread(enviarComandos, std::ref(clientes));
-        std::thread recvThread(recibirMensajesDeTodos, std::ref(clientes));
+
+        auto threadFunc = std::bind(recibirMensajesDeTodos, std::placeholders::_1, "data.txt");
+        std::thread recvThread(threadFunc, std::ref(clientes));
         sendThread.join();
         recvThread.join();
 

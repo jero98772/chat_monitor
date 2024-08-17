@@ -1,9 +1,29 @@
 #include "ClienteChat.h"
 #include <iostream>
+#include <fstream>
+
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <thread>
 #include <cstring>
+
+
+void appendToFile(const std::string& fileName, const std::string& text) {
+    std::ofstream file;
+    
+    // Open the file in append mode
+    file.open(fileName, std::ios_base::app);
+    
+    if (file.is_open()) {
+        file << text << std::endl;  // Append the text to the file
+        file.close();  // Close the file
+        return;
+    } else {
+        std::cerr << "Unable to open file." << std::endl;
+        return;
+    }
+}
+
 
 // Constructor que inicializa la dirección IP y el puerto del servidor
 ClienteChat::ClienteChat(const std::string& direccionIP, int puerto)
@@ -67,16 +87,20 @@ void ClienteChat::recibirMensajes() {
 }
 
 
-std::string ClienteChat::guardarMensajes() {
+void ClienteChat::guardarMensajes(const std::string& fileName) {
     char buffer[1024];
     while (conectado) {
         memset(buffer, 0, sizeof(buffer));
-        ssize_t bytesRecibidos = recv(descriptorCliente, buffer, 1024, 0);
+        ssize_t bytesRecibidos = recv(descriptorCliente, buffer, sizeof(buffer), 0);
         if (bytesRecibidos <= 0) {
             std::cerr << "Desconectado del servidor.\n";
             desconectar();
             break;
         }
-        return std::string(buffer, bytesRecibidos);
+        //std::string mensaje(buffer, bytesRecibidos);
+        std::string mensaje=std::string(buffer, bytesRecibidos);;
+        std::cout<<mensaje<<"\n";
+        appendToFile(fileName, mensaje);
     }
+    //return mensaje;
 }

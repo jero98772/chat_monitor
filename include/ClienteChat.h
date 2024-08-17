@@ -10,7 +10,7 @@ public:
     void manejarComando(const std::string& comando);
     void desconectar();
     void recibirMensajes();
-    std::string guardarMensajes();
+    void guardarMensajes(const std::string& fileName);
 
 private:
 
