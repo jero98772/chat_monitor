@@ -11,18 +11,28 @@
 #include "ClienteChat.h"
 #include "ServidorChat.h"
 
-
 //////////////////////////////////////
 //DEFINES 
 //#define banco
 #ifdef banco
+std::string filename="banco.ldg";
 
 
 #endif 
 
 #define productividad
 #ifdef productividad
-
+std::string filename="productividad.ldg";
+int bal() {
+    return system("bash tt bal ");
+}
+int hours() {
+    return system("bash tt hours ");
+}
+int show() {
+    std::string comand="cat "+filename;
+    return system(comand.c_str());
+}
 
 #endif 
 
@@ -81,11 +91,25 @@ void enviarComandos(std::vector<ClienteChat>& clientes) {
 
             #endif
             #ifdef productividad
+            int result;
+            if(mensaje=="/bal"){
+                result=bal();
+            }else if(mensaje=="/hours"){
+                std::cout<<"oy";
 
+                result=hours();
+            }else if(mensaje=="/show"){
+                result=show();
+            }
 
+            if (result == 0) {
+                std::cout << "Command executed successfully." << std::endl;
+            } else {
+                std::cerr << "Command execution failed." << std::endl;
+            }
             #endif
             }
-            cliente.manejarComando(mensaje);
+            //cliente.manejarComando(mensaje);
         }
     }
 }
@@ -184,7 +208,7 @@ int main(int argc, char* argv[]) {
 
         std::thread sendThread(enviarComandos, std::ref(clientes));
 
-        auto threadFunc = std::bind(recibirMensajesDeTodos, std::placeholders::_1, "data.txt");
+        auto threadFunc = std::bind(recibirMensajesDeTodos, std::placeholders::_1,filename);
         std::thread recvThread(threadFunc, std::ref(clientes));
         sendThread.join();
         recvThread.join();
