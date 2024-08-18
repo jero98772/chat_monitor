@@ -11,16 +11,42 @@
 #include "ClienteChat.h"
 #include "ServidorChat.h"
 
+
+
 //////////////////////////////////////
 //DEFINES 
-//#define banco
-#ifdef banco
+#define accounting
+//#define productividad
+
+//#define stocks// not implemented
+
+//////////////////////////////////////
+
+
+#ifdef stocks
 std::string filename="banco.ldg";
-
-
 #endif 
 
-#define productividad
+#ifdef accounting
+//python script.py data.csv --income-stats --servers-stats --user-stats
+
+std::string filename="accounting.csv ";
+std::string comand="python economic.py  "+filename;
+auto msg=system("source env/bin/activate");
+int incomeStats() {
+    comand=comand+"--income-stats";
+    return system(comand.c_str());
+}
+int servers() {
+    comand=comand+"--servers-stats";
+    return system(comand.c_str());
+}
+int users() {
+    comand=comand+"--user-stats";
+    return system(comand.c_str());
+}
+#endif 
+
 #ifdef productividad
 std::string filename="productividad.ldg";
 int bal() {
@@ -38,15 +64,10 @@ int show() {
 
 
 
-
-
-//////////////////////////////////////
-
-
 //////////////////////////////////////
 //  AUXILIAR FUNCTIONS
 
-std::vector<std::vector<std::string>> readAndParseFile(const std::string& filename) {
+std::vector<std::vector<std::string>> readAndParseFileServer(const std::string& filename) {
     std::ifstream file(filename);
     std::vector<std::vector<std::string>> matrix;
     std::string line;
@@ -77,37 +98,56 @@ void recibirMensajesDeServidor(ClienteChat& cliente) {
 void enviarComandos(std::vector<ClienteChat>& clientes) {
     std::string mensaje;
     while (std::getline(std::cin, mensaje)) {
-        std::cout<< "while"<<"\n";
+        //std::cout<< "while"<<"\n";
         for (auto& cliente : clientes) {
             std::cout<< "for"<<"\n";
             if(mensaje=="/exit"){
-                std::cout<< mensaje<<"\n";
+                //std::cout<< mensaje<<"\n";
                 cliente.desconectar();//if i dont desconect myself it will give a error when you try to conectate againg with the same port
                 //exit(0);
             }else{
             //comands of the macros #ifdef ... #endif
-            #ifdef banco
+                    std::cout<<"else";
+
+                #ifdef accounting
+
+                std::cout<<"accounting";
+                int result;
+                if(mensaje=="/income"){
+                    std::cout<<"income";
+                    result=incomeStats();
+                }else if(mensaje=="/servers"){
+                    std::cout<<"servers";
+                    result=servers();
+                }else if(mensaje=="/users"){
+                    result=users();
+                }
+
+                if (result == 0) {
+                    std::cout << "Command executed successfully." << std::endl;
+                } else {
+                    std::cerr << "Command execution failed." << std::endl;
+                }
+                #endif 
+                
 
 
-            #endif
-            #ifdef productividad
-            int result;
-            if(mensaje=="/bal"){
-                result=bal();
-            }else if(mensaje=="/hours"){
-                std::cout<<"oy";
+                #ifdef productividad
+                int result;
+                if(mensaje=="/bal"){
+                    result=bal();
+                }else if(mensaje=="/hours"){
+                    result=hours();
+                }else if(mensaje=="/show"){
+                    result=show();
+                }
 
-                result=hours();
-            }else if(mensaje=="/show"){
-                result=show();
-            }
-
-            if (result == 0) {
-                std::cout << "Command executed successfully." << std::endl;
-            } else {
-                std::cerr << "Command execution failed." << std::endl;
-            }
-            #endif
+                if (result == 0) {
+                    std::cout << "Command executed successfully." << std::endl;
+                } else {
+                    std::cerr << "Command execution failed." << std::endl;
+                }
+                #endif
             }
             //cliente.manejarComando(mensaje);
         }
@@ -126,7 +166,17 @@ void recibirMensajesDeTodos(std::vector<ClienteChat>& clientes, const std::strin
     }
 }
 
-//////////////////////////////////////
+
+
+
+
+
+
+
+
+
+
+
 
 int main(int argc, char* argv[]) {
 
@@ -170,7 +220,7 @@ int main(int argc, char* argv[]) {
         }
 
         std::string file = argv[2];
-        auto conections=readAndParseFile(file);
+        auto conections=readAndParseFileServer(file);
         std::vector<std::thread> threads;
         std::vector<ClienteChat> clientes;
 
@@ -186,15 +236,6 @@ int main(int argc, char* argv[]) {
             std::string mensaje;
             mensaje="monitor";
             cliente.manejarComando(mensaje);  // Envía el mensaje al servidor
-            
-            /*
-            std::this_thread::sleep_for(std::chrono::microseconds(100));
-            mensaje=":hola";
-            cliente.manejarComando(mensaje);  // Envía el mensaje al servidor
-            std::this_thread::sleep_for(std::chrono::microseconds(100));
-            mensaje="mi nombre es fraile";
-            cliente.manejarComando(mensaje);  // Envía el mensaje al servidor
-            */
             clientes.push_back(cliente);
             //threads.emplace_back(recibirMensajesDeServidor, std::ref(cliente));
 

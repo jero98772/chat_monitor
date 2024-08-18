@@ -25,6 +25,63 @@ void appendToFile(const std::string& fileName, const std::string& text) {
 }
 
 
+#ifdef accounting
+std::string parsetext(const std::string& input) {
+    // Find the position of the first colon
+    size_t pos = input.find(':');
+    
+    // Check if a colon was found
+    if (pos != std::string::npos) {
+        // Return the substring starting after the first colon
+        return input.substr(pos + 1);
+    } else {
+        // If no colon was found, return the original string
+        return input;
+    }
+}
+
+#endif
+
+#ifdef productividad
+std::vector<std::string> parsetext(const std::string& input) {
+    //dont tested
+    std::vector<std::string> result;
+    std::stringstream ss(input);
+    std::string line;
+
+    // Split the input string by newline character
+    while (std::getline(ss, line, '\n')) {
+        // Find the position of the first colon
+        size_t colonPos = line.find(':');
+        
+        // If a colon is found, create a substring from the character after the first colon to the end
+        if (colonPos != std::string::npos) {
+            result.push_back(line.substr(colonPos + 1));
+        }
+    }
+
+    return result;
+}
+#endif
+
+
+
+
+void parse(const std::string& fileName,const std::string& input) {
+    //dont tested
+    #ifdef productividad
+    auto output =parsetext(const std::string& input);
+    appendToFile(fileName, output[0]);
+    appendToFile(fileName, output[1]);
+    #endif
+    #ifdef accounting
+    auto output =parsetext(const std::string& input);
+    appendToFile(fileName, output);
+    #endif
+
+}
+
+
 // Constructor que inicializa la dirección IP y el puerto del servidor
 ClienteChat::ClienteChat(const std::string& direccionIP, int puerto)
     : direccionIP(direccionIP), puerto(puerto), descriptorCliente(-1), conectado(false) {}
@@ -88,6 +145,7 @@ void ClienteChat::recibirMensajes() {
 
 
 void ClienteChat::guardarMensajes(const std::string& fileName) {
+    //dont tested
     char buffer[1024];
     while (conectado) {
         memset(buffer, 0, sizeof(buffer));
@@ -98,9 +156,10 @@ void ClienteChat::guardarMensajes(const std::string& fileName) {
             break;
         }
         //std::string mensaje(buffer, bytesRecibidos);
+
         std::string mensaje=std::string(buffer, bytesRecibidos);;
         std::cout<<mensaje<<"\n";
-        appendToFile(fileName, mensaje);
+        parse(fileName, mensaje);
     }
     //return mensaje;
 }

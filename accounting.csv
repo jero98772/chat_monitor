@@ -1,0 +1,4 @@
+100 server1:user1:category1:subcategory1
+-200 server2:user2:category2:subcategory2
+150 server1:user3:category1:subcategory1
+-50 server3:user1:category3:subcategory3
