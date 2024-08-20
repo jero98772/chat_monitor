@@ -15,8 +15,8 @@
 
 //////////////////////////////////////
 //DEFINES 
-#define accounting
-//#define productividad
+//#define accounting
+#define productividad
 
 //#define stocks// not implemented
 
@@ -31,18 +31,21 @@ std::string filename="banco.ldg";
 //python script.py data.csv --income-stats --servers-stats --user-stats
 
 std::string filename="accounting.csv ";
-std::string comand="python economic.py  "+filename;
 auto msg=system("source env/bin/activate");
 int incomeStats() {
+    std::string comand="python economic.py  "+filename;
     comand=comand+"--income-stats";
     return system(comand.c_str());
 }
 int servers() {
+    std::string comand="python economic.py  "+filename;
     comand=comand+"--servers-stats";
+    std::cout<<comand<<"\n";
     return system(comand.c_str());
 }
 int users() {
-    comand=comand+"--user-stats";
+    std::string comand="python economic.py  "+filename;
+    comand=comand+"--users-stats";
     return system(comand.c_str());
 }
 #endif 
@@ -107,20 +110,20 @@ void enviarComandos(std::vector<ClienteChat>& clientes) {
                 //exit(0);
             }else{
             //comands of the macros #ifdef ... #endif
-                    std::cout<<"else";
+                std::cout<<"else\n";
 
                 #ifdef accounting
 
-                std::cout<<"accounting";
+                std::cout<<"accounting\n";
                 int result;
                 if(mensaje=="/income"){
-                    std::cout<<"income";
                     result=incomeStats();
                 }else if(mensaje=="/servers"){
-                    std::cout<<"servers";
                     result=servers();
                 }else if(mensaje=="/users"){
                     result=users();
+                }else{
+                    std::cout<<"Invalid command\n";     
                 }
 
                 if (result == 0) {
@@ -140,6 +143,8 @@ void enviarComandos(std::vector<ClienteChat>& clientes) {
                     result=hours();
                 }else if(mensaje=="/show"){
                     result=show();
+                }else{
+                    std::cout<<"Invalid command\n";     
                 }
 
                 if (result == 0) {
@@ -175,11 +180,35 @@ void recibirMensajesDeTodos(std::vector<ClienteChat>& clientes, const std::strin
 
 
 
+void banner() {
+    std::cout << "                       _ _        _ _\n";
+    std::cout << " _ __ ___   ___  _ __ (_| |_ __ _| | |\n";
+    std::cout << "| '_ ` _ \\ / _ \\| '_ \\| | __/ _` | | |\n";
+    std::cout << "| | | | | | (_) | | | | | || (_| | | |\n";
+    std::cout << "|_| |_| |_|\\___/|_| |_|_|\\__\\__,_|_|_|\n";
+    std::cout << "🦧🦧🦧🦧🦧🦧🦧🦧🦧🦧🦧🦧🦧🦧🦧🦧🦧🦧🦧\n";
+    std::cout << "         _nnnn_                      \n";
+    std::cout << "        dGGGGMMb     ,\"\"\"\"\"\"\"\"\"\"\"\"\".\n";
+    std::cout << "       @p~qp~~qMb    | Linux Rules! |\n";
+    std::cout << "       M|@||@) M|   _;..............'\n";
+    std::cout << "       @,----.JM| -'\n";
+    std::cout << "      JS^\\__/  qKL\n";
+    std::cout << "     dZP        qKRb\n";
+    std::cout << "    dZP          qKKb\n";
+    std::cout << "   fZP            SMMb\n";
+    std::cout << "   HZM            MMMM\n";
+    std::cout << "   FqM            MMMM\n";
+    std::cout << " __| \".        |\\dS\"qML\n";
+    std::cout << " |    `.       | `' \\Zq\n";
+    std::cout << "_)      \\.___.,|     .'\n";
+    std::cout << "\\____   )MMMMMM|   .'\n";
+    std::cout << "     `-'       `--' hjm\n";
+}
 
 
 
 int main(int argc, char* argv[]) {
-
+    banner();
     if (argc < 2) {
         std::cerr << "Uso: " << argv[0] << " <modo> <direccionIP> <puerto>\n";
         std::cerr << "Modos disponibles: servidor, cliente\n";
@@ -214,7 +243,7 @@ int main(int argc, char* argv[]) {
         cliente.desconectar();  // Desconecta del servidor
     }else if (modo == "superclient") {
         if (argc < 3) {
-            std::cerr << "Uso: " << argv[1] << " supercliente <lista servidores.txt>\n";
+            std::cerr << "Uso: " << argv[1] << " superclient <lista servidores.txt>\n";
             std::cerr << "Uso: " << argv[1] << argv[2];
             return 1;
         }

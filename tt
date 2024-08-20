@@ -80,7 +80,7 @@ __t_extract_project() {
 }
 
 action=$1; shift
-[ "$TIMELOG" ] && timelog="$TIMELOG" || timelog="data.ldg"
+[ "$TIMELOG" ] && timelog="$TIMELOG" || timelog="productividad.ldg"
 
 case "${action}" in
   in)   _t_in "$@";;
